@@ -17,6 +17,8 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isPaneOpen = true;
 
+    private ImageViewModel? _imageViewModel;
+
     partial void OnSelectedListItemChanged(ListItemTemplate value)
     {
         if (value != null)
@@ -66,7 +68,11 @@ public partial class MainViewModel : ViewModelBase
         }
         else if (type == typeof(ImageViewModel))
         {
-            CurrentView = new ImageViewModel();
+            if (_imageViewModel == null)
+            {
+                _imageViewModel = new ImageViewModel();
+            }
+            CurrentView = _imageViewModel;
         }
         else if (type == typeof(VideoViewModel))
         {

@@ -25,6 +25,9 @@ public partial class ImageViewModel : ViewModelBase
     [ObservableProperty]
     private bool _isLoading;
 
+    [ObservableProperty]
+    private double _progressValue;
+
     public ImageViewModel()
     {
         LoadImages();
@@ -36,6 +39,7 @@ public partial class ImageViewModel : ViewModelBase
         if (IsLoading) return;
 
         IsLoading = true;
+        ProgressValue = 0;
         Images.Clear();
         StatusMessage = "正在搜尋並載入圖片...";
 
@@ -53,6 +57,9 @@ public partial class ImageViewModel : ViewModelBase
                 Path.GetFullPath(Path.Combine(baseDir, "../../../../../images")) 
             };
 
+            // Setup progress reporting
+            var progress = new Progress<double>(p => ProgressValue = p);
+
             var loadedImages = await Task.Run(() =>
             {
                 var list = new List<ImageItem>();
@@ -69,10 +76,13 @@ public partial class ImageViewModel : ViewModelBase
                 {
                     var supportedExtensions = new[] { ".jpg", ".jpeg", ".png", ".bmp", ".webp" };
                     var files = Directory.GetFiles(imagesDir, "*.*")
-                                         .Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower()));
+                                         .Where(s => supportedExtensions.Contains(Path.GetExtension(s).ToLower()))
+                                         .ToArray();
 
-                    foreach (var file in files)
+                    int totalFiles = files.Length;
+                    for (int i = 0; i < totalFiles; i++)
                     {
+                        var file = files[i];
                         try
                         {
                             // Loading Bitmap here involves I/O
@@ -89,6 +99,9 @@ public partial class ImageViewModel : ViewModelBase
                         {
                             System.Diagnostics.Debug.WriteLine($"Error loading image {file}: {ex.Message}");
                         }
+                        
+                        // Report progress
+                        ((IProgress<double>)progress).Report((double)(i + 1) / totalFiles * 100);
                     }
                 }
                 return (list, imagesDir);
