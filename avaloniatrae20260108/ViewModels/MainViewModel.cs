@@ -31,9 +31,9 @@ public partial class MainViewModel : ViewModelBase
     {
         // Initialize Navigation Items
         Items.Add(new ListItemTemplate(typeof(HomeViewModel), "Home", "首頁"));
-        Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Image", "圖片庫"));
+        Items.Add(new ListItemTemplate(typeof(ImageViewModel), "Image", "圖片庫"));
         Items.Add(new ListItemTemplate(typeof(VideoViewModel), "Video", "影片庫"));
-        Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Music", "鋒兄音樂歌詞"));
+        Items.Add(new ListItemTemplate(typeof(MusicViewModel), "Music", "鋒兄音樂歌詞"));
         Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Subscription", "訂閱管理"));
         Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Food", "食品管理"));
         Items.Add(new ListItemTemplate(typeof(SettingsViewModel), "Settings", "系統設定"));
