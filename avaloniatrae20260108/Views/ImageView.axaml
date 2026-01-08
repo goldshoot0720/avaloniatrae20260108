@@ -11,7 +11,8 @@
         <!-- Header / Controls -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,20">
             <TextBlock Text="圖片庫" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
-            <Button Content="重新整理" Command="{Binding LoadImagesCommand}" Background="#7E57C2" Foreground="White"/>
+            <Button Content="重新整理" Command="{Binding LoadImagesCommand}" IsEnabled="{Binding !IsLoading}" Background="#7E57C2" Foreground="White"/>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsLoading}" Width="100" VerticalAlignment="Center" Margin="10,0"/>
             <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#B39DDB"/>
         </StackPanel>
 

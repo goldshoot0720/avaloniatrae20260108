@@ -34,6 +34,7 @@ public partial class MainViewModel : ViewModelBase
         Items.Add(new ListItemTemplate(typeof(ImageViewModel), "Image", "圖片庫"));
         Items.Add(new ListItemTemplate(typeof(VideoViewModel), "Video", "影片庫"));
         Items.Add(new ListItemTemplate(typeof(MusicViewModel), "Music", "鋒兄音樂歌詞"));
+        Items.Add(new ListItemTemplate(typeof(BankViewModel), "Bank", "銀行速記"));
         Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Subscription", "訂閱管理"));
         Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Food", "食品管理"));
         Items.Add(new ListItemTemplate(typeof(SettingsViewModel), "Settings", "系統設定"));
@@ -74,6 +75,10 @@ public partial class MainViewModel : ViewModelBase
         else if (type == typeof(MusicViewModel))
         {
             CurrentView = new MusicViewModel();
+        }
+        else if (type == typeof(BankViewModel))
+        {
+            CurrentView = new BankViewModel();
         }
         else
         {
