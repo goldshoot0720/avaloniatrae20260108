@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:avaloniatrae20260108.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="avaloniatrae20260108.Views.VideoView"
+             x:DataType="vm:VideoViewModel">
+    <Grid RowDefinitions="Auto,*">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="20">
+            <TextBlock Text="影片庫" FontSize="24" FontWeight="Bold" Foreground="White" />
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+                <Button Content="重新整理" Command="{Binding LoadVideosCommand}" Background="#7E57C2" Foreground="White"/>
+                <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#E0E0E0"/>
+            </StackPanel>
+            <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsLoading}" Margin="0,10,0,0"/>
+        </StackPanel>
+
+        <!-- Video List -->
+        <ScrollViewer Grid.Row="1" Margin="20,0">
+            <ItemsControl ItemsSource="{Binding Videos}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="300" Margin="0,0,20,20" Background="#4527A0" CornerRadius="10" ClipToBounds="True">
+                            <StackPanel>
+                                <!-- Thumbnail Placeholder -->
+                                <Panel Height="170" Background="Black">
+                                     <Viewbox>
+                                         <TextBlock Text="▶" Foreground="White" FontSize="50" Opacity="0.8"/>
+                                     </Viewbox>
+                                </Panel>
+                                
+                                <StackPanel Margin="15">
+                                    <TextBlock Text="{Binding Title}" FontWeight="Bold" Foreground="White" FontSize="16" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Text="{Binding PublishDate}" Foreground="#B39DDB" FontSize="12" Margin="0,5,0,0"/>
+                                    <TextBlock Text="{Binding Description}" Foreground="#E0E0E0" Margin="0,10,0,0" TextWrapping="Wrap" MaxLines="3" TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <Button Content="觀看影片" Margin="0,15,0,0" HorizontalAlignment="Right" Background="#7E57C2" Foreground="White"
+                                            Command="{Binding ((vm:VideoViewModel)DataContext).OpenVideoCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding YoutubeUrl}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,89 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:avaloniatrae20260108.ViewModels"
+        xmlns:views="using:avaloniatrae20260108.Views"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="avaloniatrae20260108.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="鋒兄AI資訊系統">
+
+    <Window.DataTemplates>
+        <DataTemplate DataType="{x:Type vm:HomeViewModel}">
+            <views:HomeView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
+            <views:SettingsView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:VideoViewModel}">
+            <views:VideoView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ViewModelBase}">
+             <Grid>
+                <TextBlock Text="功能開發中..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="24"/>
+             </Grid>
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <Grid ColumnDefinitions="250,*">
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="#5E35B1">
+            <Grid RowDefinitions="Auto,*">
+                <!-- Logo/Brand -->
+                <StackPanel Orientation="Horizontal" Margin="20" Spacing="10">
+                    <Border Background="#FF5252" CornerRadius="5" Padding="5">
+                        <TextBlock Text="鋒" Foreground="White" FontWeight="Bold"/>
+                    </Border>
+                    <TextBlock Text="鋒兄AI系統" Foreground="White" FontWeight="Bold" FontSize="18" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Menu -->
+                <ListBox Grid.Row="1" ItemsSource="{Binding Items}" SelectedItem="{Binding SelectedListItem}" Background="Transparent" Margin="0,20,0,0">
+                    <ListBox.Styles>
+                        <Style Selector="ListBoxItem">
+                            <Setter Property="Padding" Value="20,10"/>
+                            <Setter Property="Foreground" Value="#B39DDB"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="CornerRadius" Value="0,20,20,0"/>
+                            <Setter Property="Margin" Value="0,0,10,5"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#7E57C2"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                        <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                            <Setter Property="Background" Value="#7E57C2"/>
+                            <Setter Property="Foreground" Value="White"/>
+                        </Style>
+                    </ListBox.Styles>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="15">
+                                <!-- Icon Placeholder -->
+                                <Border Width="4" Height="4" Background="White" CornerRadius="2" VerticalAlignment="Center"/> 
+                                <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Border Grid.Column="1" Background="#673AB7">
+            <Grid RowDefinitions="Auto,*">
+                <!-- Header Bar -->
+                <Grid Height="60" Background="#5E35B1">
+                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                         <Button Content="☰" Background="Transparent" Foreground="White" Command="{Binding TriggerPaneCommand}"/>
+                         <TextBlock Text="{Binding SelectedListItem.Label}" Foreground="White" FontSize="18" Margin="20,0,0,0" VerticalAlignment="Center"/>
+                     </StackPanel>
+                </Grid>
+                
+                <!-- Content View -->
+                <TransitioningContentControl Grid.Row="1" Content="{Binding CurrentView}" Margin="0"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

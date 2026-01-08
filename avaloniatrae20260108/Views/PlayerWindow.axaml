@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vlc="clr-namespace:LibVLCSharp.Avalonia;assembly=LibVLCSharp.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="avaloniatrae20260108.Views.PlayerWindow"
+        Title="影片播放"
+        Width="800" Height="600"
+        WindowStartupLocation="CenterScreen">
+    <Grid RowDefinitions="*,Auto">
+        <Border Name="VideoContainer" Grid.Row="0" Background="Black"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Spacing="20">
+             <Button Name="BtnStop" Content="停止" />
+             <Button Name="BtnPlay" Content="播放" />
+             <Button Name="BtnPause" Content="暫停" />
+        </StackPanel>
+    </Grid>
+</Window>

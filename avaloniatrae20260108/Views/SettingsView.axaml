@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:avaloniatrae20260108.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="avaloniatrae20260108.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+    <StackPanel Margin="20" Spacing="20">
+        <TextBlock Text="系統設定" FontSize="24" FontWeight="Bold" Foreground="White" />
+        
+        <Border Background="#7E57C2" CornerRadius="10" Padding="20">
+            <StackPanel Spacing="15">
+                <TextBlock Text="Contentful 設定" FontSize="18" Foreground="White"/>
+                <TextBlock Text="請設定您的 Contentful Space ID 與 Delivery Access Token。" Foreground="#E0E0E0"/>
+
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Space ID" Foreground="White"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Text="{Binding SpaceId}" Grid.Column="0" Margin="0,0,10,0"/>
+                        <Button Content="複製" Grid.Column="1"/>
+                    </Grid>
+                </StackPanel>
+
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Access Token (Delivery API)" Foreground="White"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Text="{Binding AccessToken}" Grid.Column="0" Margin="0,0,10,0"/>
+                        <Button Content="複製" Grid.Column="1"/>
+                    </Grid>
+                </StackPanel>
+                
+                 <StackPanel Spacing="5">
+                    <TextBlock Text="Management Token (CMA - 用於寫入)" Foreground="White"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBox Text="{Binding ManagementToken}" PasswordChar="●" Grid.Column="0" Margin="0,0,10,0"/>
+                        <Button Content="複製" Grid.Column="1"/>
+                    </Grid>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+                    <TextBlock Text="{Binding TestResult}" Foreground="{Binding TestResultColor}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <Button Content="儲存設定" Background="#FF5252" Foreground="White" Command="{Binding SaveSettingsCommand}"/>
+                    <Button Content="測試 Token 權限" Background="White" Foreground="Black" Command="{Binding TestTokenCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>
