@@ -1,0 +1,39 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:avaloniatrae20260108.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="avaloniatrae20260108.Views.ImageView"
+             x:DataType="vm:ImageViewModel">
+
+    <Grid RowDefinitions="Auto,*" Margin="20">
+        <!-- Header / Controls -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,20">
+            <TextBlock Text="圖片庫" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+            <Button Content="重新整理" Command="{Binding LoadImagesCommand}" Background="#7E57C2" Foreground="White"/>
+            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#B39DDB"/>
+        </StackPanel>
+
+        <!-- Image Grid -->
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl ItemsSource="{Binding Images}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Width="200" Height="240" Margin="10" Background="#4527A0" CornerRadius="8" Padding="10">
+                            <Grid RowDefinitions="*,Auto">
+                                <Image Grid.Row="0" Source="{Binding Bitmap}" Stretch="Uniform" Margin="0,0,0,10"/>
+                                <TextBlock Grid.Row="1" Text="{Binding Title}" Foreground="White" TextWrapping="Wrap" TextAlignment="Center" HorizontalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

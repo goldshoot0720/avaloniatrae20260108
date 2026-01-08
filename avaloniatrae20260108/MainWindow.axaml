@@ -16,8 +16,14 @@
         <DataTemplate DataType="{x:Type vm:SettingsViewModel}">
             <views:SettingsView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ImageViewModel}">
+            <views:ImageView/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:VideoViewModel}">
             <views:VideoView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:MusicViewModel}">
+            <views:MusicView/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ViewModelBase}">
              <Grid>

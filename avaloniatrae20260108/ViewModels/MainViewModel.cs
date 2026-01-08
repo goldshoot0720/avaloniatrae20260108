@@ -50,6 +50,11 @@ public partial class MainViewModel : ViewModelBase
 
     public void SwitchView(Type type)
     {
+        if (CurrentView is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+
         if (type == typeof(HomeViewModel))
         {
             CurrentView = new HomeViewModel();
@@ -58,9 +63,17 @@ public partial class MainViewModel : ViewModelBase
         {
             CurrentView = new SettingsViewModel();
         }
+        else if (type == typeof(ImageViewModel))
+        {
+            CurrentView = new ImageViewModel();
+        }
         else if (type == typeof(VideoViewModel))
         {
             CurrentView = new VideoViewModel();
+        }
+        else if (type == typeof(MusicViewModel))
+        {
+            CurrentView = new MusicViewModel();
         }
         else
         {
