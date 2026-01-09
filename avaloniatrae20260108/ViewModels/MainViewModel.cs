@@ -18,6 +18,8 @@ public partial class MainViewModel : ViewModelBase
     private bool _isPaneOpen = true;
 
     private ImageViewModel? _imageViewModel;
+    private FoodViewModel? _foodViewModel;
+    private SubscriptionViewModel? _subscriptionViewModel;
 
     partial void OnSelectedListItemChanged(ListItemTemplate value)
     {
@@ -37,8 +39,8 @@ public partial class MainViewModel : ViewModelBase
         Items.Add(new ListItemTemplate(typeof(VideoViewModel), "Video", "影片庫"));
         Items.Add(new ListItemTemplate(typeof(MusicViewModel), "Music", "鋒兄音樂歌詞"));
         Items.Add(new ListItemTemplate(typeof(BankViewModel), "Bank", "銀行速記"));
-        Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Subscription", "訂閱管理"));
-        Items.Add(new ListItemTemplate(typeof(ViewModelBase), "Food", "食品管理"));
+        Items.Add(new ListItemTemplate(typeof(SubscriptionViewModel), "Subscription", "訂閱管理"));
+        Items.Add(new ListItemTemplate(typeof(FoodViewModel), "Food", "食品管理"));
         Items.Add(new ListItemTemplate(typeof(SettingsViewModel), "Settings", "系統設定"));
 
         // Default view
@@ -85,6 +87,22 @@ public partial class MainViewModel : ViewModelBase
         else if (type == typeof(BankViewModel))
         {
             CurrentView = new BankViewModel();
+        }
+        else if (type == typeof(FoodViewModel))
+        {
+            if (_foodViewModel == null)
+            {
+                _foodViewModel = new FoodViewModel();
+            }
+            CurrentView = _foodViewModel;
+        }
+        else if (type == typeof(SubscriptionViewModel))
+        {
+            if (_subscriptionViewModel == null)
+            {
+                _subscriptionViewModel = new SubscriptionViewModel();
+            }
+            CurrentView = _subscriptionViewModel;
         }
         else
         {

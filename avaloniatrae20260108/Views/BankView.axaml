@@ -36,7 +36,10 @@
                 </StackPanel>
                 
                 <TextBlock Text="{Binding TotalAmount, StringFormat={}{0:C0}}" Grid.Column="1" Foreground="#FFD740" FontSize="24" FontWeight="Bold" Margin="0,0,20,0" VerticalAlignment="Center"/>
-                <Button Grid.Column="2" Content="儲存 (Save)" Command="{Binding SaveCommand}" Background="#7E57C2" Foreground="White" FontWeight="Bold" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Button Content="讀取 (Load)" Command="{Binding LoadCommand}" Background="#FF7043" Foreground="White" FontWeight="Bold"/>
+                    <Button Content="儲存 (Save)" Command="{Binding SaveCommand}" Background="#7E57C2" Foreground="White" FontWeight="Bold"/>
+                </StackPanel>
             </Grid>
         </Border>
     </Grid>

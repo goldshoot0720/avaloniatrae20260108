@@ -28,6 +28,12 @@
         <DataTemplate DataType="{x:Type vm:BankViewModel}">
             <views:BankView/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SubscriptionViewModel}">
+            <views:SubscriptionView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FoodViewModel}">
+            <views:FoodView/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type vm:ViewModelBase}">
              <Grid>
                 <TextBlock Text="功能開發中..." HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="24"/>

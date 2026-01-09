@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:avaloniatrae20260108.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="avaloniatrae20260108.Views.FoodView"
+             x:DataType="vm:FoodViewModel">
+
+    <Grid ColumnDefinitions="3*, 2*" Margin="20">
+        
+        <!-- List Area -->
+        <Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="0,0,20,0">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <TextBlock Text="食品清單" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+                <Button Content="🔄 同步" Command="{Binding SyncContentfulCommand}" Margin="10,0,0,0" Background="#7E57C2" Foreground="White" CornerRadius="5"/>
+            </StackPanel>
+            
+            <ScrollViewer Grid.Row="1">
+                <ItemsControl ItemsSource="{Binding Foods}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Background="#4527A0" CornerRadius="8" Margin="0,0,0,10" Padding="10">
+                                <Grid ColumnDefinitions="Auto, *, Auto">
+                                    <!-- Photo Thumbnail -->
+                                    <Border Grid.Column="0" Width="60" Height="60" CornerRadius="4" ClipToBounds="True" Background="#311B92" Margin="0,0,10,0">
+                                        <Image Source="{Binding PhotoBitmap}" Stretch="UniformToFill"/>
+                                    </Border>
+                                    
+                                    <!-- Info -->
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="White" FontSize="16"/>
+                                        <TextBlock Foreground="#B0BEC5" FontSize="12">
+                                            <Run Text="數量: "/><Run Text="{Binding Amount}"/>
+                                            <Run Text=" | 價格: $"/><Run Text="{Binding Price}"/>
+                                        </TextBlock>
+                                        <TextBlock Text="{Binding Shop}" Foreground="#90CAF9" FontSize="12"/>
+                                        <TextBlock Text="{Binding ToDate, StringFormat='到期日: {0:yyyy-MM-dd}'}" Foreground="#FFAB91" FontSize="12"/>
+                                    </StackPanel>
+                                    
+                                    <!-- Delete Button -->
+                                    <Button Grid.Column="2" Command="{Binding $parent[UserControl].((vm:FoodViewModel)DataContext).DeleteFoodCommand}" 
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
+                                        <TextBlock Text="🗑" FontSize="20" Foreground="#EF5350"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Edit/Add Area -->
+        <Border Grid.Column="1" Background="#5E35B1" CornerRadius="10" Padding="20">
+            <ScrollViewer>
+                <StackPanel Spacing="15">
+                    <TextBlock Text="新增食品" FontSize="20" FontWeight="Bold" Foreground="White"/>
+
+                    <StackPanel>
+                        <TextBlock Text="名稱 (Name)" Foreground="#E0E0E0"/>
+                        <TextBox Text="{Binding NewFood.Name}" />
+                    </StackPanel>
+
+                    <Grid ColumnDefinitions="*, 10, *">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="數量 (Amount)" Foreground="#E0E0E0"/>
+                            <NumericUpDown Value="{Binding NewFood.Amount}" Minimum="1" FormatString="0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="價格 (Price)" Foreground="#E0E0E0"/>
+                            <NumericUpDown Value="{Binding NewFood.Price}" Minimum="0" FormatString="C0"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel>
+                        <TextBlock Text="到期日 (To Date)" Foreground="#E0E0E0"/>
+                        <DatePicker SelectedDate="{Binding NewFood.ToDate}" HorizontalAlignment="Stretch"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="商店 (Shop)" Foreground="#E0E0E0"/>
+                        <TextBox Text="{Binding NewFood.Shop}" />
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="圖片 (Photo)" Foreground="#E0E0E0"/>
+                        <Button Name="BrowseButton" Content="選擇圖片..." Click="BrowseButton_Click" HorizontalAlignment="Stretch"/>
+                        <Border Height="150" Background="#4527A0" Margin="0,10,0,0" CornerRadius="5" ClipToBounds="True">
+                             <Image Source="{Binding NewFood.PhotoBitmap}" Stretch="Uniform"/>
+                        </Border>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="Hash: " Foreground="#9E9E9E" VerticalAlignment="Center"/>
+                            <TextBox Text="{Binding NewFood.PhotoHash}" Width="150" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button Command="{Binding AddFoodCommand}" Content="加入清單" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="#00E676" Foreground="Black" FontWeight="Bold" Margin="0,10,0,0"/>
+
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="#FFD740" TextWrapping="Wrap" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+    </Grid>
+</UserControl>
