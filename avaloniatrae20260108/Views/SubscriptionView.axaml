@@ -19,7 +19,7 @@
             <ScrollViewer Grid.Row="1">
                 <ItemsControl ItemsSource="{Binding Subscriptions}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="vm:SubscriptionItem">
                             <Border Background="#4527A0" CornerRadius="8" Margin="0,0,0,10" Padding="15">
                                 <Grid ColumnDefinitions="*, Auto">
                                     <StackPanel Grid.Column="0">
@@ -34,11 +34,23 @@
                                     </StackPanel>
                                     
                                     <!-- Delete Button -->
-                                    <Button Grid.Column="1" Command="{Binding $parent[UserControl].((vm:SubscriptionViewModel)DataContext).DeleteSubscriptionCommand}" 
-                                            CommandParameter="{Binding}"
-                                            Background="Transparent" BorderThickness="0" VerticalAlignment="Center">
-                                        <TextBlock Text="🗑" FontSize="20" Foreground="#EF5350"/>
-                                    </Button>
+                                    <Panel Grid.Column="1" VerticalAlignment="Center">
+                                        <Button Command="{Binding RequestDeleteCommand}"
+                                                IsVisible="{Binding !IsDeleting}"
+                                                Background="Transparent" BorderThickness="0">
+                                            <TextBlock Text="🗑" FontSize="20" Foreground="#EF5350"/>
+                                        </Button>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsDeleting}">
+                                            <Button Content="確定" 
+                                                    Command="{Binding $parent[UserControl].((vm:SubscriptionViewModel)DataContext).DeleteSubscriptionCommand}" 
+                                                    CommandParameter="{Binding}"
+                                                    Background="#EF5350" Foreground="White" FontSize="12"/>
+                                            <Button Content="取消" 
+                                                    Command="{Binding CancelDeleteCommand}"
+                                                    Background="Gray" Foreground="White" FontSize="12"/>
+                                        </StackPanel>
+                                    </Panel>
                                 </Grid>
                             </Border>
                         </DataTemplate>

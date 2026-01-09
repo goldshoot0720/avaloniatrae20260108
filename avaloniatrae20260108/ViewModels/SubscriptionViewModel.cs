@@ -241,4 +241,20 @@ public partial class SubscriptionItem : ObservableObject
 
     [ObservableProperty]
     private string _account = string.Empty;
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private bool _isDeleting;
+
+    [RelayCommand]
+    private void RequestDelete()
+    {
+        IsDeleting = true;
+    }
+
+    [RelayCommand]
+    private void CancelDelete()
+    {
+        IsDeleting = false;
+    }
 }
