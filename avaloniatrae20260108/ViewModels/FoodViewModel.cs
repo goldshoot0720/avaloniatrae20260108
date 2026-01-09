@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System;
 using Avalonia.Media.Imaging;
@@ -11,6 +12,8 @@ using Contentful.Core;
 using Contentful.Core.Configuration;
 using Contentful.Core.Models;
 using System.Linq;
+using avaloniatrae20260108.Models;
+using Newtonsoft.Json;
 
 namespace avaloniatrae20260108.ViewModels;
 
@@ -201,6 +204,9 @@ public partial class FoodViewModel : ViewModelBase
             
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "foods.txt");
             System.IO.File.WriteAllLines(path, lines);
+            
+            // Notify other views (e.g. Home)
+            WeakReferenceMessenger.Default.Send(new DashboardUpdateMessage());
         }
         catch (Exception ex)
         {
@@ -284,6 +290,22 @@ public partial class FoodItem : ObservableObject
 
     [ObservableProperty]
     private string _photoHash = string.Empty;
+
+    [ObservableProperty]
+    [property: JsonIgnore]
+    private bool _isDeleting;
+
+    [RelayCommand]
+    private void RequestDelete()
+    {
+        IsDeleting = true;
+    }
+
+    [RelayCommand]
+    private void CancelDelete()
+    {
+        IsDeleting = false;
+    }
 }
 
 public class ContentfulFood

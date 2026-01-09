@@ -1,8 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
+using avaloniatrae20260108.Models;
 using System;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using Avalonia.Threading;
 
 namespace avaloniatrae20260108.ViewModels;
 
@@ -39,6 +42,11 @@ public partial class HomeViewModel : ViewModelBase
     public HomeViewModel()
     {
         LoadDashboardData();
+
+        WeakReferenceMessenger.Default.Register<DashboardUpdateMessage>(this, (r, m) =>
+        {
+            Dispatcher.UIThread.InvokeAsync(LoadDashboardData);
+        });
     }
 
     private void LoadDashboardData()

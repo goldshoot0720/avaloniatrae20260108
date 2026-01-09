@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using System.Collections.ObjectModel;
 using System;
 using System.IO;
@@ -11,6 +12,7 @@ using Contentful.Core;
 using Contentful.Core.Configuration;
 using Contentful.Core.Models;
 using Newtonsoft.Json;
+using avaloniatrae20260108.Models;
 
 namespace avaloniatrae20260108.ViewModels;
 
@@ -172,6 +174,9 @@ public partial class SubscriptionViewModel : ViewModelBase
             
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "subscriptions.txt");
             System.IO.File.WriteAllLines(path, lines);
+            
+            // Notify other views (e.g. Home)
+            WeakReferenceMessenger.Default.Send(new DashboardUpdateMessage());
         }
         catch (Exception ex)
         {
