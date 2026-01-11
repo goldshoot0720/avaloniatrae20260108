@@ -30,6 +30,9 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private string _statusMessage = string.Empty;
 
+    [ObservableProperty]
+    private bool _isLyricsLoading;
+
     public MusicViewModel()
     {
         InitializePlayer();
@@ -110,12 +113,12 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
         }
     }
 
-    partial void OnSelectedMusicChanged(MusicItem? value)
+    async partial void OnSelectedMusicChanged(MusicItem? value)
     {
         if (value != null)
         {
             PlayMusic(value);
-            LoadLyrics(value);
+            await LoadLyricsAsync(value);
         }
     }
 
@@ -137,25 +140,35 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private void LoadLyrics(MusicItem item)
+    private async Task LoadLyricsAsync(MusicItem item)
     {
-        if (item.LyricsPath != null && File.Exists(item.LyricsPath))
+        IsLyricsLoading = true;
+        CurrentLyrics = string.Empty; // Clear current lyrics while loading
+
+        try
         {
-            try
+            // Simulate loading delay to show the indicator (as requested by user to have a visible hint)
+            await Task.Delay(500);
+
+            if (item.LyricsPath != null && File.Exists(item.LyricsPath))
             {
-                var content = File.ReadAllText(item.LyricsPath);
+                var content = await File.ReadAllTextAsync(item.LyricsPath);
                 // Simple LRC parsing logic could be added here to format it nicely
                 // For now, just show raw or lightly formatted text
-                CurrentLyrics = content; 
+                CurrentLyrics = content;
             }
-            catch (Exception ex)
+            else
             {
-                CurrentLyrics = $"無法讀取歌詞: {ex.Message}";
+                CurrentLyrics = "無歌詞檔案";
             }
         }
-        else
+        catch (Exception ex)
         {
-            CurrentLyrics = "無歌詞檔案";
+            CurrentLyrics = $"無法讀取歌詞: {ex.Message}";
+        }
+        finally
+        {
+            IsLyricsLoading = false;
         }
     }
 

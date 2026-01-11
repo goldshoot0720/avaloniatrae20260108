@@ -35,9 +35,16 @@
             <Border Grid.Column="1" Background="#4527A0" CornerRadius="10" Padding="20">
                 <DockPanel>
                      <TextBlock Text="歌詞" DockPanel.Dock="Top" Foreground="White" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                    <ScrollViewer>
-                        <TextBlock Text="{Binding CurrentLyrics}" Foreground="White" FontSize="18" TextWrapping="Wrap" TextAlignment="Center" LineHeight="30"/>
-                    </ScrollViewer>
+                    <Panel>
+                        <ScrollViewer IsVisible="{Binding !IsLyricsLoading}">
+                            <TextBlock Text="{Binding CurrentLyrics}" Foreground="White" FontSize="18" TextWrapping="Wrap" TextAlignment="Center" LineHeight="30"/>
+                        </ScrollViewer>
+                        
+                        <StackPanel IsVisible="{Binding IsLyricsLoading}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+                            <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#B39DDB"/>
+                            <TextBlock Text="歌詞載入中..." Foreground="#B39DDB" FontSize="14" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Panel>
                 </DockPanel>
             </Border>
         </Grid>
