@@ -7,6 +7,7 @@ using System.Linq;
 using LibVLCSharp.Shared;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Avalonia.Threading;
 
 namespace avaloniatrae20260108.ViewModels;
 
@@ -33,10 +34,17 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
     [ObservableProperty]
     private bool _isLyricsLoading;
 
+    [ObservableProperty]
+    private bool _isLoading;
+
+    [ObservableProperty]
+    private double _progressValue;
+
     public MusicViewModel()
     {
         InitializePlayer();
-        LoadMusic();
+        // Fire and forget
+        _ = LoadMusic();
     }
 
     private void InitializePlayer()
@@ -58,9 +66,45 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
     }
 
     [RelayCommand]
-    public void LoadMusic()
+    public async Task LoadMusic()
     {
+        if (IsLoading) return;
+
+        IsLoading = true;
+        ProgressValue = 0;
         MusicList.Clear();
+        StatusMessage = "正在搜尋並載入歌曲...";
+
+        try
+        {
+            var progress = new Progress<double>(p => ProgressValue = p);
+
+            await Task.Run(async () =>
+            {
+                await LoadLocalMusicAsync(progress);
+            });
+
+            if (MusicList.Count > 0)
+            {
+                StatusMessage = $"已載入 {MusicList.Count} 首歌曲";
+            }
+            else
+            {
+                StatusMessage = "找不到 musics 資料夾";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"載入失敗: {ex.Message}";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task LoadLocalMusicAsync(IProgress<double> progress)
+    {
         try
         {
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -87,8 +131,11 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
             if (musicsDir != null && Directory.Exists(musicsDir))
             {
                 var mp3Files = Directory.GetFiles(musicsDir, "*.mp3");
-                foreach (var mp3 in mp3Files)
+                int totalFiles = mp3Files.Length;
+
+                for (int i = 0; i < totalFiles; i++)
                 {
+                    var mp3 = mp3Files[i];
                     var fileName = Path.GetFileNameWithoutExtension(mp3);
                     var txtPath = Path.Combine(musicsDir, fileName + ".txt");
                     
@@ -98,18 +145,22 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
                         FilePath = mp3,
                         LyricsPath = File.Exists(txtPath) ? txtPath : null
                     };
-                    MusicList.Add(musicItem);
+
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        MusicList.Add(musicItem);
+                    });
+
+                    // Simulate slight delay for visual effect
+                    await Task.Delay(50);
+
+                    progress.Report((double)(i + 1) / totalFiles * 100);
                 }
-                StatusMessage = $"已載入 {MusicList.Count} 首歌曲";
-            }
-            else
-            {
-                StatusMessage = "找不到 musics 資料夾";
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"載入失敗: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"Local music load error: {ex.Message}");
         }
     }
 

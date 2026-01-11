@@ -7,8 +7,19 @@
              x:Class="avaloniatrae20260108.Views.MusicView"
              x:DataType="vm:MusicViewModel">
     
-    <Grid RowDefinitions="*,Auto" Margin="20">
-        <Grid ColumnDefinitions="300,*" Grid.Row="0">
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,20">
+            <TextBlock Text="鋒兄音樂歌詞" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+            <Button Content="重新整理" Command="{Binding LoadMusicCommand}" IsEnabled="{Binding !IsLoading}" Background="#7E57C2" Foreground="White"/>
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding IsLoading}" VerticalAlignment="Center" Margin="10,0">
+                <ProgressBar Value="{Binding ProgressValue}" Maximum="100" IsIndeterminate="False" Width="200" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding ProgressValue, StringFormat={}{0:0}%}" Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0"/>
+            </StackPanel>
+            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#B39DDB"/>
+        </StackPanel>
+
+        <Grid ColumnDefinitions="300,*" Grid.Row="1">
             <!-- Music List -->
             <Border Grid.Column="0" Background="#4527A0" CornerRadius="10" Padding="10" Margin="0,0,10,0">
                 <DockPanel>
@@ -50,7 +61,7 @@
         </Grid>
 
         <!-- Controls -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,20,0,0">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,20,0,0">
             <Button Content="播放/暫停" Command="{Binding TogglePlayPauseCommand}" Background="#7E57C2" Foreground="White" Padding="20,10" CornerRadius="5"/>
             <Button Content="停止" Command="{Binding StopCommand}" Background="#EF5350" Foreground="White" Padding="20,10" CornerRadius="5"/>
             <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#B39DDB" Margin="20,0,0,0"/>

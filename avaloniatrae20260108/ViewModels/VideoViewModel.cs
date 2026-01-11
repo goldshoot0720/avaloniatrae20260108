@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System;
 using System.Linq;
+using Avalonia.Threading;
 
 namespace avaloniatrae20260108.ViewModels;
 
@@ -18,64 +19,82 @@ public partial class VideoViewModel : ViewModelBase
     private bool _isLoading;
 
     [ObservableProperty]
+    private double _progressValue;
+
+    [ObservableProperty]
     private string? _statusMessage;
 
     public ObservableCollection<Video> Videos { get; } = new();
 
     public VideoViewModel()
     {
-        LoadVideosCommand.Execute(null);
+        // Fire and forget
+        _ = LoadVideos();
     }
 
     [RelayCommand]
     public async Task LoadVideos()
     {
+        if (IsLoading) return;
+
         IsLoading = true;
-        StatusMessage = "正在載入影片...";
+        ProgressValue = 0;
         Videos.Clear();
+        StatusMessage = "正在搜尋並載入影片...";
 
         try
         {
-            // 1. Load from Contentful
-            try 
+            var progress = new Progress<double>(p => ProgressValue = p);
+            
+            await Task.Run(async () => 
             {
-                var settings = LoadSettings();
-                if (!string.IsNullOrEmpty(settings.SpaceId) && !string.IsNullOrEmpty(settings.AccessToken))
+                // 1. Contentful (Optional, simplified progress)
+                // We don't report granular progress for API, just say we are doing it.
+                await Dispatcher.UIThread.InvokeAsync(() => StatusMessage = "正在檢查線上影片...");
+                
+                try 
                 {
-                    var options = new ContentfulOptions
+                    var settings = LoadSettings();
+                    if (!string.IsNullOrEmpty(settings.SpaceId) && !string.IsNullOrEmpty(settings.AccessToken))
                     {
-                        DeliveryApiKey = settings.AccessToken,
-                        SpaceId = settings.SpaceId
-                    };
-
-                    var client = new ContentfulClient(new HttpClient(), options);
-                    var entries = await client.GetEntries<Video>(queryString: "?content_type=video");
-
-                    if (entries.Any())
-                    {
-                        foreach (var item in entries)
+                        var options = new ContentfulOptions
                         {
-                            Videos.Add(item);
+                            DeliveryApiKey = settings.AccessToken,
+                            SpaceId = settings.SpaceId
+                        };
+
+                        var client = new ContentfulClient(new HttpClient(), options);
+                        var entries = await client.GetEntries<Video>(queryString: "?content_type=video");
+
+                        if (entries.Any())
+                        {
+                            await Dispatcher.UIThread.InvokeAsync(() => 
+                            {
+                                foreach (var item in entries)
+                                {
+                                    Videos.Add(item);
+                                }
+                            });
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                // Log Contentful error but continue to local
-                System.Diagnostics.Debug.WriteLine($"Contentful load error: {ex.Message}");
-            }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Contentful load error: {ex.Message}");
+                }
 
-            // 2. Load local videos
-            LoadLocalVideos();
-
-            if (Videos.Any())
+                // 2. Local Videos (with progress)
+                await Dispatcher.UIThread.InvokeAsync(() => StatusMessage = "正在搜尋本機影片...");
+                await LoadLocalVideosAsync(progress);
+            });
+            
+            if (Videos.Count > 0)
             {
-                StatusMessage = $"成功載入 {Videos.Count} 部影片";
+                StatusMessage = $"已載入 {Videos.Count} 部影片";
             }
             else
             {
-                StatusMessage = "找不到影片資料。\n請確認 Contentful 上是否有 'video' 類型的內容，\n或是將影片檔案放入應用程式目錄下的 'videos' 資料夾中。";
+                StatusMessage = "找不到影片資料";
             }
         }
         catch (Exception ex)
@@ -88,7 +107,7 @@ public partial class VideoViewModel : ViewModelBase
         }
     }
 
-    private void LoadLocalVideos()
+    private async Task LoadLocalVideosAsync(IProgress<double> progress)
     {
         try
         {
@@ -101,19 +120,33 @@ public partial class VideoViewModel : ViewModelBase
                     .Where(f => f.EndsWith(".mp4", StringComparison.OrdinalIgnoreCase) || 
                                 f.EndsWith(".avi", StringComparison.OrdinalIgnoreCase) ||
                                 f.EndsWith(".mkv", StringComparison.OrdinalIgnoreCase) ||
-                                f.EndsWith(".mov", StringComparison.OrdinalIgnoreCase));
+                                f.EndsWith(".mov", StringComparison.OrdinalIgnoreCase))
+                    .ToArray();
 
-                foreach (var file in files)
+                int totalFiles = files.Length;
+                
+                for (int i = 0; i < totalFiles; i++)
                 {
+                    var file = files[i];
                     var fileInfo = new System.IO.FileInfo(file);
-                    Videos.Add(new Video
+                    var video = new Video
                     {
                         Title = System.IO.Path.GetFileNameWithoutExtension(fileInfo.Name),
                         Description = "本機影片",
                         YoutubeUrl = fileInfo.FullName,
                         PublishDate = fileInfo.CreationTime.ToString("yyyy-MM-dd"),
                         Sys = new SystemProperties { Id = Guid.NewGuid().ToString() }
+                    };
+
+                    await Dispatcher.UIThread.InvokeAsync(() => 
+                    {
+                        Videos.Add(video);
                     });
+                    
+                    // Simulate slight delay for visual effect
+                    await Task.Delay(50);
+
+                    progress.Report((double)(i + 1) / totalFiles * 100);
                 }
             }
         }
@@ -130,7 +163,6 @@ public partial class VideoViewModel : ViewModelBase
 
         try
         {
-            // Open in-app player
             var playerWindow = new Views.PlayerWindow(url);
             playerWindow.Show();
         }
