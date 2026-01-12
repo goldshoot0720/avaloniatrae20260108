@@ -10,11 +10,16 @@ using System.Net.Http;
 using System;
 using System.Linq;
 using Avalonia.Threading;
+using System.Collections.Generic;
 
 namespace avaloniatrae20260108.ViewModels;
 
 public partial class VideoViewModel : ViewModelBase
 {
+    // 記憶體暫存
+    private static List<Video>? _cachedVideos = null;
+    private static bool _isFirstLoad = true;
+
     [ObservableProperty]
     private bool _isLoading;
 
@@ -28,8 +33,12 @@ public partial class VideoViewModel : ViewModelBase
 
     public VideoViewModel()
     {
-        // Fire and forget
-        _ = LoadVideos();
+        // 延遲載入，避免阻塞UI
+        Dispatcher.UIThread.Post(async () =>
+        {
+            await Task.Delay(100);
+            await LoadVideos();
+        });
     }
 
     [RelayCommand]
@@ -37,6 +46,24 @@ public partial class VideoViewModel : ViewModelBase
     {
         if (IsLoading) return;
 
+        // 檢查是否有暫存資料
+        if (_cachedVideos != null && !_isFirstLoad)
+        {
+            IsLoading = true;
+            StatusMessage = "從記憶體載入影片...";
+            
+            Videos.Clear();
+            foreach (var video in _cachedVideos)
+            {
+                Videos.Add(video);
+            }
+            
+            StatusMessage = $"已從記憶體載入 {Videos.Count} 部影片";
+            IsLoading = false;
+            return;
+        }
+
+        // 第一次載入
         IsLoading = true;
         ProgressValue = 0;
         Videos.Clear();
@@ -45,11 +72,11 @@ public partial class VideoViewModel : ViewModelBase
         try
         {
             var progress = new Progress<double>(p => ProgressValue = p);
+            var tempVideos = new List<Video>();
             
             await Task.Run(async () => 
             {
                 // 1. Contentful (Optional, simplified progress)
-                // We don't report granular progress for API, just say we are doing it.
                 await Dispatcher.UIThread.InvokeAsync(() => StatusMessage = "正在檢查線上影片...");
                 
                 try 
@@ -68,13 +95,7 @@ public partial class VideoViewModel : ViewModelBase
 
                         if (entries.Any())
                         {
-                            await Dispatcher.UIThread.InvokeAsync(() => 
-                            {
-                                foreach (var item in entries)
-                                {
-                                    Videos.Add(item);
-                                }
-                            });
+                            tempVideos.AddRange(entries);
                         }
                     }
                 }
@@ -85,12 +106,22 @@ public partial class VideoViewModel : ViewModelBase
 
                 // 2. Local Videos (with progress)
                 await Dispatcher.UIThread.InvokeAsync(() => StatusMessage = "正在搜尋本機影片...");
-                await LoadLocalVideosAsync(progress);
+                await LoadLocalVideosAsync(progress, tempVideos);
             });
+            
+            // 將資料加入UI並暫存
+            foreach (var video in tempVideos)
+            {
+                Videos.Add(video);
+            }
+            
+            // 暫存到記憶體
+            _cachedVideos = new List<Video>(tempVideos);
+            _isFirstLoad = false;
             
             if (Videos.Count > 0)
             {
-                StatusMessage = $"已載入 {Videos.Count} 部影片";
+                StatusMessage = $"已載入 {Videos.Count} 部影片 (已暫存至記憶體)";
             }
             else
             {
@@ -107,7 +138,16 @@ public partial class VideoViewModel : ViewModelBase
         }
     }
 
-    private async Task LoadLocalVideosAsync(IProgress<double> progress)
+    [RelayCommand]
+    public async Task RefreshVideos()
+    {
+        // 清除暫存，強制重新載入
+        _cachedVideos = null;
+        _isFirstLoad = true;
+        await LoadVideos();
+    }
+
+    private async Task LoadLocalVideosAsync(IProgress<double> progress, List<Video> tempVideos)
     {
         try
         {
@@ -138,13 +178,13 @@ public partial class VideoViewModel : ViewModelBase
                         Sys = new SystemProperties { Id = Guid.NewGuid().ToString() }
                     };
 
-                    await Dispatcher.UIThread.InvokeAsync(() => 
-                    {
-                        Videos.Add(video);
-                    });
+                    tempVideos.Add(video);
                     
-                    // Simulate slight delay for visual effect
-                    await Task.Delay(50);
+                    // 減少延遲時間
+                    if (i % 5 == 0)
+                    {
+                        await Task.Delay(10);
+                    }
 
                     progress.Report((double)(i + 1) / totalFiles * 100);
                 }

@@ -12,6 +12,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="0,0,0,20">
             <TextBlock Text="鋒兄音樂歌詞" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
             <Button Content="重新整理" Command="{Binding LoadMusicCommand}" IsEnabled="{Binding !IsLoading}" Background="#7E57C2" Foreground="White"/>
+            <Button Content="強制刷新" Command="{Binding RefreshMusicCommand}" IsEnabled="{Binding !IsLoading}" Background="#EF5350" Foreground="White"/>
             <StackPanel Orientation="Horizontal" IsVisible="{Binding IsLoading}" VerticalAlignment="Center" Margin="10,0">
                 <ProgressBar Value="{Binding ProgressValue}" Maximum="100" IsIndeterminate="False" Width="200" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding ProgressValue, StringFormat={}{0:0}%}" Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0"/>
@@ -51,10 +52,45 @@
                             <TextBlock Text="{Binding CurrentLyrics}" Foreground="White" FontSize="18" TextWrapping="Wrap" TextAlignment="Center" LineHeight="30"/>
                         </ScrollViewer>
                         
-                        <StackPanel IsVisible="{Binding IsLyricsLoading}" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
-                            <ProgressBar IsIndeterminate="True" Width="200" Height="4" Foreground="#B39DDB"/>
-                            <TextBlock Text="歌詞載入中..." Foreground="#B39DDB" FontSize="14" HorizontalAlignment="Center"/>
-                        </StackPanel>
+                        <!-- Enhanced Loading Screen for Lyrics -->
+                        <Border IsVisible="{Binding IsLyricsLoading}" 
+                                Background="#3F2A5C" 
+                                CornerRadius="10" 
+                                Opacity="0.95">
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                                <!-- Loading Animation -->
+                                <Border Width="80" Height="80" 
+                                        Background="#7E57C2" 
+                                        CornerRadius="40"
+                                        HorizontalAlignment="Center">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
+                                        <TextBlock Text="♪" FontSize="32" Foreground="White" HorizontalAlignment="Center"/>
+                                        <ProgressBar IsIndeterminate="True" Width="50" Height="3" Foreground="White"/>
+                                    </StackPanel>
+                                </Border>
+                                
+                                <!-- Loading Text -->
+                                <StackPanel Spacing="8" HorizontalAlignment="Center">
+                                    <TextBlock Text="載入歌詞中..." 
+                                               Foreground="White" 
+                                               FontSize="18" 
+                                               FontWeight="SemiBold"
+                                               HorizontalAlignment="Center"/>
+                                    <TextBlock Text="{Binding SelectedMusic.Title, StringFormat='正在處理：{0}'}" 
+                                               Foreground="#B39DDB" 
+                                               FontSize="14" 
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                                
+                                <!-- Progress Indicator -->
+                                <ProgressBar IsIndeterminate="True" 
+                                             Width="250" 
+                                             Height="6" 
+                                             Foreground="#B39DDB"
+                                             Background="#2A1B3D"
+                                             CornerRadius="3"/>
+                            </StackPanel>
+                        </Border>
                     </Panel>
                 </DockPanel>
             </Border>

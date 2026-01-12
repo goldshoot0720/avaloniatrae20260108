@@ -11,6 +11,7 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="20" Margin="20">
             <TextBlock Text="影片庫" FontSize="24" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
             <Button Content="重新整理" Command="{Binding LoadVideosCommand}" IsEnabled="{Binding !IsLoading}" Background="#7E57C2" Foreground="White"/>
+            <Button Content="強制刷新" Command="{Binding RefreshVideosCommand}" IsEnabled="{Binding !IsLoading}" Background="#EF5350" Foreground="White"/>
             <StackPanel Orientation="Horizontal" IsVisible="{Binding IsLoading}" VerticalAlignment="Center" Margin="10,0">
                 <ProgressBar Value="{Binding ProgressValue}" Maximum="100" IsIndeterminate="False" Width="200" VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding ProgressValue, StringFormat={}{0:0}%}" Foreground="White" VerticalAlignment="Center" Margin="5,0,0,0"/>
