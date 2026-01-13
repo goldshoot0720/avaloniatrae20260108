@@ -100,6 +100,17 @@ public partial class PlayerWindow : Window
                     _suppressPositionUpdate = false;
                 });
             };
+            
+            _mediaPlayer.PositionChanged += (s, e) =>
+            {
+                var position = e.Position; // 0..1
+                Dispatcher.UIThread.Post(() =>
+                {
+                    _suppressPositionUpdate = true;
+                    if (_timeline != null) _timeline.Value = position * 100.0;
+                    _suppressPositionUpdate = false;
+                });
+            };
         }
 
         this.Closing += (s, e) => 
