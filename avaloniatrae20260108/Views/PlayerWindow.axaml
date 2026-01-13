@@ -10,10 +10,17 @@
         WindowStartupLocation="CenterScreen">
     <Grid RowDefinitions="*,Auto">
         <Border Name="VideoContainer" Grid.Row="0" Background="Black"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" Margin="10" Spacing="20">
-             <Button Name="BtnStop" Content="停止" />
-             <Button Name="BtnPlay" Content="播放" />
-             <Button Name="BtnPause" Content="暫停" />
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="10" Spacing="10">
+            <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                <TextBlock Name="LblTime" Text="00:00" Foreground="White" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                <Slider Name="Timeline" Minimum="0" Maximum="100" Value="0" Height="16"/>
+                <TextBlock Name="LblDuration" Text="00:00" Foreground="White" Margin="8,0,0,0" VerticalAlignment="Center"/>
+            </Grid>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                 <Button Name="BtnStop" Content="停止" />
+                 <Button Name="BtnPlay" Content="播放" />
+                 <Button Name="BtnPause" Content="暫停" />
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>

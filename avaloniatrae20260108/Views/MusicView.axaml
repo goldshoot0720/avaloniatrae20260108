@@ -20,87 +20,110 @@
             <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#B39DDB"/>
         </StackPanel>
 
-        <Grid ColumnDefinitions="300,*" Grid.Row="1">
-            <!-- Music List -->
-            <Border Grid.Column="0" Background="#4527A0" CornerRadius="10" Padding="10" Margin="0,0,10,0">
-                <DockPanel>
-                    <TextBlock Text="歌曲列表" DockPanel.Dock="Top" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
-                    <ListBox ItemsSource="{Binding MusicList}" SelectedItem="{Binding SelectedMusic}" Background="Transparent">
-                         <ListBox.Styles>
-                            <Style Selector="ListBoxItem">
-                                <Setter Property="Foreground" Value="White"/>
-                            </Style>
-                             <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
-                                 <Setter Property="Background" Value="#7E57C2"/>
-                             </Style>
-                        </ListBox.Styles>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Title}" Foreground="White" Padding="5"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </DockPanel>
-            </Border>
+        <!-- Content with friendly loading overlay -->
+        <Panel Grid.Row="1">
+            <Grid ColumnDefinitions="300,*">
+                <!-- Music List -->
+                <Border Grid.Column="0" Background="#4527A0" CornerRadius="10" Padding="10" Margin="0,0,10,0">
+                    <DockPanel>
+                        <TextBlock Text="歌曲列表" DockPanel.Dock="Top" Foreground="White" FontWeight="Bold" Margin="0,0,0,10"/>
+                        <ListBox ItemsSource="{Binding MusicList}" SelectedItem="{Binding SelectedMusic}" Background="Transparent">
+                             <ListBox.Styles>
+                                <Style Selector="ListBoxItem">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Style>
+                                 <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                     <Setter Property="Background" Value="#7E57C2"/>
+                                 </Style>
+                            </ListBox.Styles>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Title}" Foreground="White" Padding="5"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
 
-            <!-- Lyrics -->
-            <Border Grid.Column="1" Background="#4527A0" CornerRadius="10" Padding="20">
-                <DockPanel>
-                     <TextBlock Text="歌詞" DockPanel.Dock="Top" Foreground="White" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                    <Panel>
-                        <ScrollViewer IsVisible="{Binding !IsLyricsLoading}">
-                            <TextBlock Text="{Binding CurrentLyrics}" Foreground="White" FontSize="18" TextWrapping="Wrap" TextAlignment="Center" LineHeight="30"/>
-                        </ScrollViewer>
-                        
-                        <!-- Enhanced Loading Screen for Lyrics -->
-                        <Border IsVisible="{Binding IsLyricsLoading}" 
-                                Background="#3F2A5C" 
-                                CornerRadius="10" 
-                                Opacity="0.95">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
-                                <!-- Loading Animation -->
-                                <Border Width="80" Height="80" 
-                                        Background="#7E57C2" 
-                                        CornerRadius="40"
-                                        HorizontalAlignment="Center">
-                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
-                                        <TextBlock Text="♪" FontSize="32" Foreground="White" HorizontalAlignment="Center"/>
-                                        <ProgressBar IsIndeterminate="True" Width="50" Height="3" Foreground="White"/>
+                <!-- Lyrics -->
+                <Border Grid.Column="1" Background="#4527A0" CornerRadius="10" Padding="20">
+                    <DockPanel>
+                         <TextBlock Text="歌詞" DockPanel.Dock="Top" Foreground="White" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                        <Panel>
+                            <ScrollViewer IsVisible="{Binding !IsLyricsLoading}">
+                                <TextBlock Text="{Binding CurrentLyrics}" Foreground="White" FontSize="18" TextWrapping="Wrap" TextAlignment="Center" LineHeight="30"/>
+                            </ScrollViewer>
+                            
+                            <!-- Enhanced Loading Screen for Lyrics -->
+                            <Border IsVisible="{Binding IsLyricsLoading}" 
+                                    Background="#3F2A5C" 
+                                    CornerRadius="10" 
+                                    Opacity="0.95">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                                    <!-- Loading Animation -->
+                                    <Border Width="80" Height="80" 
+                                            Background="#7E57C2" 
+                                            CornerRadius="40"
+                                            HorizontalAlignment="Center">
+                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
+                                            <TextBlock Text="♪" FontSize="32" Foreground="White" HorizontalAlignment="Center"/>
+                                            <ProgressBar IsIndeterminate="True" Width="50" Height="3" Foreground="White"/>
+                                        </StackPanel>
+                                    </Border>
+                                    
+                                    <!-- Loading Text -->
+                                    <StackPanel Spacing="8" HorizontalAlignment="Center">
+                                        <TextBlock Text="載入歌詞中..." 
+                                                   Foreground="White" 
+                                                   FontSize="18" 
+                                                   FontWeight="SemiBold"
+                                                   HorizontalAlignment="Center"/>
+                                        <TextBlock Text="{Binding SelectedMusic.Title, StringFormat='正在處理：{0}'}" 
+                                                   Foreground="#B39DDB" 
+                                                   FontSize="14" 
+                                                   HorizontalAlignment="Center"/>
                                     </StackPanel>
-                                </Border>
-                                
-                                <!-- Loading Text -->
-                                <StackPanel Spacing="8" HorizontalAlignment="Center">
-                                    <TextBlock Text="載入歌詞中..." 
-                                               Foreground="White" 
-                                               FontSize="18" 
-                                               FontWeight="SemiBold"
-                                               HorizontalAlignment="Center"/>
-                                    <TextBlock Text="{Binding SelectedMusic.Title, StringFormat='正在處理：{0}'}" 
-                                               Foreground="#B39DDB" 
-                                               FontSize="14" 
-                                               HorizontalAlignment="Center"/>
+                                    
+                                    <!-- Progress Indicator -->
+                                    <ProgressBar IsIndeterminate="True" 
+                                                 Width="250" 
+                                                 Height="6" 
+                                                 Foreground="#B39DDB"
+                                                 Background="#2A1B3D"
+                                                 CornerRadius="3"/>
                                 </StackPanel>
-                                
-                                <!-- Progress Indicator -->
-                                <ProgressBar IsIndeterminate="True" 
-                                             Width="250" 
-                                             Height="6" 
-                                             Foreground="#B39DDB"
-                                             Background="#2A1B3D"
-                                             CornerRadius="3"/>
-                            </StackPanel>
-                        </Border>
-                    </Panel>
-                </DockPanel>
+                            </Border>
+                        </Panel>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <!-- Friendly full-screen loading overlay -->
+            <Border IsVisible="{Binding IsLoading}"
+                    Background="#2A1B3D"
+                    Opacity="0.90">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="16">
+                    <TextBlock Text="正在搜尋並載入歌曲..." Foreground="White" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                    <ProgressBar Value="{Binding ProgressValue}" Maximum="100" Width="280" Height="8" Foreground="#B39DDB" Background="#1E1330" CornerRadius="4"/>
+                    <TextBlock Text="{Binding ProgressValue, StringFormat={}{0:0}%}" Foreground="#B39DDB" FontSize="14" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="#E0E0E0" FontSize="12" HorizontalAlignment="Center"/>
+                </StackPanel>
             </Border>
-        </Grid>
+        </Panel>
 
         <!-- Controls -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,20,0,0">
-            <Button Content="播放/暫停" Command="{Binding TogglePlayPauseCommand}" Background="#7E57C2" Foreground="White" Padding="20,10" CornerRadius="5"/>
-            <Button Content="停止" Command="{Binding StopCommand}" Background="#EF5350" Foreground="White" Padding="20,10" CornerRadius="5"/>
-            <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#B39DDB" Margin="20,0,0,0"/>
+        <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Stretch" Spacing="12" Margin="20,20,20,0">
+            <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                <TextBlock Text="{Binding CurrentTimeText}" Foreground="White" FontSize="14" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <Slider Grid.Column="1" Minimum="0" Maximum="1" Value="{Binding PlaybackPosition, Mode=TwoWay}" IsEnabled="{Binding IsPlaying}" 
+                        Margin="0,0,0,0" Height="16"/>
+                <TextBlock Grid.Column="2" Text="{Binding DurationText}" Foreground="White" FontSize="14" VerticalAlignment="Center" Margin="10,0,0,0"/>
+            </Grid>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20">
+                <Button Content="播放/暫停" Command="{Binding TogglePlayPauseCommand}" Background="#7E57C2" Foreground="White" Padding="20,10" CornerRadius="5"/>
+                <Button Content="停止" Command="{Binding StopCommand}" Background="#EF5350" Foreground="White" Padding="20,10" CornerRadius="5"/>
+                <TextBlock Text="{Binding StatusMessage}" VerticalAlignment="Center" Foreground="#B39DDB" Margin="20,0,0,0"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </UserControl>

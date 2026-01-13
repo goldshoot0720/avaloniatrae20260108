@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using LibVLCSharp.Shared;
 using LibVLCSharp.Avalonia;
 using System;
+using Avalonia.Threading;
 
 namespace avaloniatrae20260108.Views;
 
@@ -12,6 +13,10 @@ public partial class PlayerWindow : Window
     private LibVLC? _libVLC;
     private MediaPlayer? _mediaPlayer;
     private LibVLCSharp.Avalonia.VideoView? _videoView;
+    private Slider? _timeline;
+    private TextBlock? _lblTime;
+    private TextBlock? _lblDuration;
+    private bool _suppressPositionUpdate;
 
     public PlayerWindow()
     {
@@ -52,6 +57,50 @@ public partial class PlayerWindow : Window
         if (btnStop != null) btnStop.Click += (s, e) => _mediaPlayer.Stop();
         if (btnPlay != null) btnPlay.Click += (s, e) => _mediaPlayer.Play();
         if (btnPause != null) btnPause.Click += (s, e) => _mediaPlayer.Pause();
+        
+        _timeline = this.FindControl<Slider>("Timeline");
+        _lblTime = this.FindControl<TextBlock>("LblTime");
+        _lblDuration = this.FindControl<TextBlock>("LblDuration");
+        
+        if (_timeline != null)
+        {
+            _timeline.PropertyChanged += (s, e) =>
+            {
+                if (e.Property != Slider.ValueProperty) return;
+                if (_mediaPlayer == null) return;
+                if (_suppressPositionUpdate) return;
+                var pos = Math.Clamp(_timeline.Value / 100.0, 0, 1);
+                _mediaPlayer.Position = (float)pos;
+            };
+        }
+        
+        if (_mediaPlayer != null)
+        {
+            _mediaPlayer.LengthChanged += (s, e) =>
+            {
+                var len = _mediaPlayer?.Length ?? 0;
+                var text = FormatTime(len);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (_lblDuration != null) _lblDuration.Text = text;
+                });
+            };
+            
+            _mediaPlayer.TimeChanged += (s, e) =>
+            {
+                var time = _mediaPlayer?.Time ?? 0;
+                var len = _mediaPlayer?.Length ?? 0;
+                var pos = len > 0 ? Math.Clamp((double)time / len, 0, 1) : 0;
+                var timeText = FormatTime(time);
+                Dispatcher.UIThread.Post(() =>
+                {
+                    _suppressPositionUpdate = true;
+                    if (_timeline != null) _timeline.Value = pos * 100.0;
+                    if (_lblTime != null) _lblTime.Text = timeText;
+                    _suppressPositionUpdate = false;
+                });
+            };
+        }
 
         this.Closing += (s, e) => 
         {
@@ -87,5 +136,13 @@ public partial class PlayerWindow : Window
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+    }
+    
+    private string FormatTime(long ms)
+    {
+        if (ms < 0) ms = 0;
+        var ts = TimeSpan.FromMilliseconds(ms);
+        if (ts.Hours > 0) return $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+        return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
     }
 }

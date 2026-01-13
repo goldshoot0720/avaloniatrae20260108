@@ -43,6 +43,23 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
 
     [ObservableProperty]
     private double _progressValue;
+    
+    [ObservableProperty]
+    private double _durationMs;
+    
+    [ObservableProperty]
+    private double _currentTimeMs;
+    
+    [ObservableProperty]
+    private double _playbackPosition;
+    
+    [ObservableProperty]
+    private string _currentTimeText = "00:00";
+    
+    [ObservableProperty]
+    private string _durationText = "00:00";
+    
+    private bool _suppressPositionUpdate;
 
     public MusicViewModel()
     {
@@ -65,6 +82,28 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
             _mediaPlayer.EndReached += (s, e) => 
             {
                 IsPlaying = false;
+            };
+            _mediaPlayer.LengthChanged += (s, e) =>
+            {
+                var len = _mediaPlayer?.Length ?? 0;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    DurationMs = len;
+                    DurationText = FormatTime(len);
+                });
+            };
+            _mediaPlayer.TimeChanged += (s, e) =>
+            {
+                var time = _mediaPlayer?.Time ?? 0;
+                var len = _mediaPlayer?.Length ?? 0;
+                Dispatcher.UIThread.Post(() =>
+                {
+                    _suppressPositionUpdate = true;
+                    CurrentTimeMs = time;
+                    PlaybackPosition = len > 0 ? Math.Clamp((double)time / len, 0, 1) : 0;
+                    CurrentTimeText = FormatTime(time);
+                    _suppressPositionUpdate = false;
+                });
             };
         }
         catch (Exception ex)
@@ -232,6 +271,9 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
             _mediaPlayer.Play();
             IsPlaying = true;
             StatusMessage = $"正在播放: {item.Title}";
+            PlaybackPosition = 0;
+            CurrentTimeMs = 0;
+            CurrentTimeText = "00:00";
         }
         catch (Exception ex)
         {
@@ -311,6 +353,24 @@ public partial class MusicViewModel : ViewModelBase, IDisposable
         _mediaPlayer?.Stop();
         _mediaPlayer?.Dispose();
         _libVLC?.Dispose();
+    }
+    
+    partial void OnPlaybackPositionChanged(double value)
+    {
+        if (_mediaPlayer == null) return;
+        if (_suppressPositionUpdate) return;
+        var len = _mediaPlayer.Length;
+        if (len <= 0) return;
+        var target = (long)(Math.Clamp(value, 0, 1) * len);
+        _mediaPlayer.Time = target;
+    }
+    
+    private string FormatTime(long ms)
+    {
+        if (ms < 0) ms = 0;
+        var ts = TimeSpan.FromMilliseconds(ms);
+        if (ts.Hours > 0) return $"{ts.Hours:D2}:{ts.Minutes:D2}:{ts.Seconds:D2}";
+        return $"{ts.Minutes:D2}:{ts.Seconds:D2}";
     }
 }
 
